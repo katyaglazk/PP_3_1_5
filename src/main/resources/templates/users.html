@@ -7,31 +7,43 @@
 <body>
 <h1>All users</h1>
 <br/>
-<input type="button" value="Add" onclick="window.location.href = 'users/new'">
+<input type="button" value="Add" onclick="window.location.href = '/admin/new'">
 <br/>
 <br/>
 <div>
     <table border="1">
         <tr>
+
             <th>ID</th>
+            <th>Username</th>
+            <th>Password</th>
             <th>Name</th>
             <th>Surname</th>
             <th>Email</th>
             <th>Operations</th>
         </tr>
         <tr th:each="user : ${users}">
-
             <td th:utext="${user.getId()}">...</td>
+            <td th:utext="${user.getUsername()}">...</td>
+            <td th:utext="${user.getPassword()}">...</td>
             <td th:utext="${user.getName()}">...</td>
             <td th:utext="${user.getSurname()}">...</td>
             <td th:utext="${user.getEmail()}">...</td>
             <td>
-                <a type="button" th:href="@{/users/update/(id=${user.getId()})}" >Update</a>
-                <a type="button" th:href="@{/users/delete/(id=${user.getId()})}" >Delete</a>
+                <a type="button" th:href="@{/admin/open/(id=${user.getId()})}" >Open</a>
+                <a type="button" th:href="@{/admin/update/(id=${user.getId()})}" >Update</a>
+                <a type="button" th:href="@{/admin/delete/(id=${user.getId()})}" >Delete</a>
             </td>
 
         </tr>
     </table>
 </div>
+
+
+
+<form th:action="@{/logout}" th:method="POST">
+    <input type="submit" value="Logout">
+</form>
+
 </body>
 </html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New user</title>
+</head>
+<body>
+
+<form th:method="POST" th:action="@{/admin}" th:object="${user}">
+
+    <input type="hidden" th:nname="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+    <label for="username">Укажите ник: </label>
+    <input type="text" th:field="*{username}" id="username">
+    <div style="color: red" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Username Error</div>
+    <br/><br/>
+    <label for="password">Придумайте пароль: </label>
+    <input type="password" th:field="*{password}" id="password">
+    <div style="color: red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
+    <br/><br/>
+    <br/><br/>
+    <label for="name">Ваше имя: </label>
+    <input type="text" th:field="*{name}" id="name">
+    <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>
+    <br/><br/>
+    <label for="surname">Ваша фамилия: </label>
+    <input type="text" th:field="*{surname}" id="surname">
+    <div style="color: red" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">Surname Error</div>
+    <br/><br/>
+    <label for="email">Ваш email: </label>
+    <input type="text" th:field="*{email}" id="email">
+    <div style="color: red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
+    <br/><br/>
+
+    <p>
+        <label>Roles:
+            <input type="checkbox" name="authorities" th:each="role : ${allRoles}"
+                th:text="${role.getName()}" th:value="${role.getId()}"/>
+        </label>
+    </p>
+
+    <input type="submit" value="Sign up">
+
+    <!--    <button class="btn btn-secondary" type="submit"-->
+    <!--            th:href="@{/registration}"  th:text="*{getId()}? 'Save' : 'Create'"/>-->
+
+</form>
+<br/><br/>
+<form th:action="@{/admin}" th:method="GET">
+    <input type="submit" value="Back to the users">
+</form>
+</body>
+</html>
