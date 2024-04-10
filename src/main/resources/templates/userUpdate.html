@@ -9,7 +9,7 @@
 <br/>
 <br/>
 
-<form th:method="POST" th:action="@{/admin}" th:object="${user}">
+<form th:method="POST" th:action="@{/admin/update/}" th:object="${user}">
 
     <input type="hidden" th:nname="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 

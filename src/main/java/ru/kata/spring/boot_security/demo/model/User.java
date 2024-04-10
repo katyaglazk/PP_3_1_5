@@ -42,7 +42,7 @@ public class User {
     @Size(min = 2, message = "Не меньше 5 знаков")
     private String username;
 
-
+    @NotEmpty(message = "Придумайте пароль")
     @Size(min = 2, message = "Не меньше 5 знаков")
     private String password;
 

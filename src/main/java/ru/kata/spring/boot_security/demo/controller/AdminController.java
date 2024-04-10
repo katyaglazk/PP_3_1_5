@@ -1,9 +1,9 @@
 package ru.kata.spring.boot_security.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,57 +16,49 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
 
+@Validated
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final PasswordEncoder getPasswordEncoder;
 
-    @Autowired
-    public AdminController(UserService userService, RoleService roleService, PasswordEncoder getPasswordEncoder) {
+
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.getPasswordEncoder = getPasswordEncoder;
     }
 
-    @GetMapping("")
+    @GetMapping
     public String admin(Model model) {
-
         List<User> users = userService.getAllUser();
         model.addAttribute("users", users);
-
         return "users";
     }
 
     @GetMapping("/new")
     public String addPage(Model model) {
-
         model.addAttribute("user", new User());
         List<Role> roles = roleService.getAllRoles();
         model.addAttribute("allRoles", roles);
-
         return "new";
     }
 
     @PostMapping
-    public String addUser(@ModelAttribute("user") @Valid User user,
+    public String addUser(@ModelAttribute("user") @Valid User user, BindingResult result,
                           @RequestParam("authorities") List<String> values) {
 
-        Set<Role> roles = userService.getSetOfRoles(values);
-        user.setRoles(roles);
-        user.setPassword(getPasswordEncoder.encode(user.getPassword()));
-
-        if (user.getId() == null) {
-            userService.add(user);
-        } else {
-            userService.update(user);
+        if (result.hasErrors()) {
+            return "new";
         }
-
+        userService.saveUser(user, values);
+        if (user.getId() == null) {
+            return "new";
+        }
         return "redirect:/admin";
+
     }
 
     @GetMapping("/update/")
@@ -76,17 +68,16 @@ public class AdminController {
         model.addAttribute("user", user);
         List<Role> roles = roleService.getAllRoles();
         model.addAttribute("allRoles", roles);
-
         return "/userUpdate";
     }
 
     @PostMapping("/update/")
-    public String updateUser(@RequestParam("id") Long id, User user,
+    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult result,
                              @RequestParam("authorities") List<String> values) {
-
-        Set<Role> roleSet = userService.getSetOfRoles(values);
-        user.setRoles(roleSet);
-        userService.update(user);
+        if (result.hasErrors()) {
+            return "userUpdate";
+        }
+        userService.update(user, values);
 
         return "redirect:/admin";
     }
