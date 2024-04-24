@@ -4,17 +4,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @Validated
@@ -32,52 +29,45 @@ public class AdminController {
     }
 
     @GetMapping
-    public String admin(Model model) {
+    public String admin(Model model, Principal principal) {
+        User user = userService.getUserByUsername(principal.getName());
+        model.addAttribute("user", user);
         List<User> users = userService.getAllUser();
         model.addAttribute("users", users);
+        List<Role> roles = roleService.getAllRoles();
+        model.addAttribute("roles", roles);
         return "users";
     }
 
     @GetMapping("/new")
-    public String addPage(Model model) {
-        model.addAttribute("user", new User());
+    public String addPage(Model model, Principal principal) {
+        User user = userService.getUserByUsername(principal.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("newUser", new User());
         List<Role> roles = roleService.getAllRoles();
         model.addAttribute("allRoles", roles);
         return "new";
     }
 
     @PostMapping
-    public String addUser(@ModelAttribute("user") @Valid User user, BindingResult result,
-                          @RequestParam("authorities") List<String> values) {
+    public String addUser(@ModelAttribute("newUser") @Valid User newUser, BindingResult result,
+                          @RequestParam(value = "roles") String[] selectResult) {
 
         if (result.hasErrors()) {
             return "new";
         }
-        userService.saveUser(user, values);
-        if (user.getId() == null) {
+        userService.saveUser(newUser, List.of(selectResult));
+        if (newUser.getId() == null) {
             return "new";
         }
         return "redirect:/admin";
-
     }
 
-    @GetMapping("/update/")
-    public String update(@RequestParam(value = "id", defaultValue = "") Long id, Model model) {
+    @PutMapping("/update/")
+    public String updateUser(@ModelAttribute("user") User user,
+                             @RequestParam(value = "rolesSelector") String[] selectResult) {
 
-        User user = userService.getById(id);
-        model.addAttribute("user", user);
-        List<Role> roles = roleService.getAllRoles();
-        model.addAttribute("allRoles", roles);
-        return "/userUpdate";
-    }
-
-    @PostMapping("/update/")
-    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult result,
-                             @RequestParam("authorities") List<String> values) {
-        if (result.hasErrors()) {
-            return "userUpdate";
-        }
-        userService.update(user, values);
+        userService.update(user, List.of(selectResult));
 
         return "redirect:/admin";
     }
@@ -91,7 +81,7 @@ public class AdminController {
         return "/user";
     }
 
-    @GetMapping("/delete/")
+    @DeleteMapping("/delete/")
     public String deleteNewUser(@RequestParam(value = "id", defaultValue = "") Long id) {
 
         User user = userService.getById(id);
@@ -99,5 +89,13 @@ public class AdminController {
 
         return "redirect:/admin";
     }
+
+    @GetMapping("/user/")
+    public String user(Model model, Principal principal) {
+        User user = userService.getUserByUsername(principal.getName());
+        model.addAttribute("user", user);
+        return "/user";
+    }
+
 }
 

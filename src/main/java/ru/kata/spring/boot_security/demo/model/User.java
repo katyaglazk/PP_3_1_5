@@ -20,6 +20,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -37,6 +38,8 @@ public class User {
     private String surname;
 
     private String email;
+
+    private int age;
 
     @NotEmpty(message = "Никнейм не должен быть пустым")
     @Size(min = 2, message = "Не меньше 5 знаков")
@@ -57,11 +60,12 @@ public class User {
     public User() {
     }
 
-    public User(String name, String username, String password, String email, String surname) {
+    public User(String name, String username, String password, String email, int age, String surname) {
         this.name = name;
         this.username = username;
         this.password = password;
         this.email = email;
+        this.age = age;
         this.surname = surname;
     }
 
@@ -117,6 +121,13 @@ public class User {
         this.email = email;
     }
 
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
     public Set<Role> getRoles() {
         return roles;
     }
@@ -133,4 +144,7 @@ public class User {
         return username;
     }
 
+    public String getRolesName() {
+        return getRoles().stream().map(Role::getName).collect(Collectors.joining(", "));
+    }
 }
