@@ -6,15 +6,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.service.UsersDetailsService;
+import ru.kata.spring.boot_security.demo.service.UsersDetailsServiceImpl;
 
 @Component
 public class UserValidator implements Validator {
 
-    private final UsersDetailsService usersDetailsService;
+    private final UsersDetailsServiceImpl usersDetailsService;
 
     @Autowired
-    public UserValidator(UsersDetailsService usersDetailsService) {
+    public UserValidator(UsersDetailsServiceImpl usersDetailsService) {
         this.usersDetailsService = usersDetailsService;
     }
 

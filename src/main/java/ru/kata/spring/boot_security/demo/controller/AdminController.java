@@ -51,12 +51,12 @@ public class AdminController {
 
     @PostMapping
     public String addUser(@ModelAttribute("newUser") @Valid User newUser, BindingResult result,
-                          @RequestParam(value = "roles") String[] selectResult) {
+                          @RequestParam(value = "roles") List<Long> selectResult) {
 
         if (result.hasErrors()) {
             return "new";
         }
-        userService.saveUser(newUser, List.of(selectResult));
+        userService.saveUser(newUser, roleService.getSetOfRoles(selectResult));
         if (newUser.getId() == null) {
             return "new";
         }
@@ -65,9 +65,9 @@ public class AdminController {
 
     @PutMapping("/update/")
     public String updateUser(@ModelAttribute("user") User user,
-                             @RequestParam(value = "rolesSelector") String[] selectResult) {
+                             @RequestParam(value = "rolesSelector") List<Long> selectResult) {
 
-        userService.update(user, List.of(selectResult));
+        userService.update(user, roleService.getSetOfRoles(selectResult));
 
         return "redirect:/admin";
     }

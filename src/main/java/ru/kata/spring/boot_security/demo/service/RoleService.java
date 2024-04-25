@@ -7,24 +7,13 @@ import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 
 import java.util.List;
+import java.util.Set;
 
-@Service
-public class RoleService {
+public interface RoleService {
 
-    private final RoleRepository roleRepository;
+    Role getRoleById(Long id);
 
-    @Autowired
-    public RoleService(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
+    List<Role> getAllRoles();
 
-    @Transactional(readOnly = true)
-    public Role getRoleById(Long id) {
-        return roleRepository.getById(id);
-    }
-
-    @Transactional
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
-    }
+    Set<Role> getSetOfRoles(List<Long> roleId);
 }
