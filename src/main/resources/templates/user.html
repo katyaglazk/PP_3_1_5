@@ -8,18 +8,19 @@
     <title>User page</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark">
+<nav class="navbar navbar-dark bg-dark" id="navbar">
     <div class="container-fluid">
         <p class="navbar-brand text-white">
-            <b><span class="align-middle" th:text="${user.email}"></span></b>
-            <span class="align-middle">with roles:</span>
-            <span class="align-middle" th:text="${user.getRolesName}"></span>
+            <b><span id="navbar-username" class="navbar-brand" href="/user"></span></b>
+            <span class="navbar-brand">with roles: </span>
+            <span id="navbar-roles" class="navbar-brand"></span>
         </p>
-        <form th:action="@{/logout}" th:method="POST">
-            <button type="button" class="btn btn-dark">Logout</button>
-        </form>
+<!--        <form th:action="@{/logout}" method="POST">-->
+            <a type="submit" class="btn btn-dark" href="/logout">Logout</a>
+<!--        </form>-->
     </div>
 </nav>
 
@@ -27,11 +28,15 @@
     <div class="row h-100">
 
         <div class="p-0 col-2">
-            <div class="nav flex-column nav-pills pt-4" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <a class="nav-link" href="/admin" sec:authorize="hasAuthority('ROLE_ADMIN')" role="tab"
-                   aria-controls="v-pills-home" aria-selected="true">Admin</a>
-                <a class="nav-link active" href="/user" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')"
-                   role="tab" aria-controls="v-pills-home" aria-selected="false">User</a>
+            <div class="nav flex-column nav-pills pt-4" id="v-pills-tab-admin" role="tablist"
+                 aria-orientation="vertical">
+
+                <a class="nav-link" id="v-pills-admin-tab" href="/admin"
+                   role="tab" aria-controls="v-pills-tab-admin" aria-selected="false">Admin</a>
+
+                <a class="nav-link active" href="/user" id="v-pills-user-tab"
+                   role="tab" aria-controls="user-v-pills-tab" aria-selected="true">User</a>
+
             </div>
         </div>
 
@@ -50,16 +55,18 @@
                                     <th>Username</th>
                                     <th>First Name</th>
                                     <th>Last Name</th>
+                                    <th>Age</th>
                                     <th>Email</th>
                                     <th>Role</th>
                                 </tr>
                                 <tr>
-                                    <td th:text="${user.getId()}">...</td>
-                                    <td th:text="${user.getUsername()}">...</td>
-                                    <td th:text="${user.getName()}">...</td>
-                                    <td th:text="${user.getSurname()}">...</td>
-                                    <td th:text="${user.getEmail()}">...</td>
-                                    <td th:text="${user.getRolesName()}">...</td>
+                                    <td id="td_id">...</td>
+                                    <td id="td_username">...</td>
+                                    <td id="td_name">...</td>
+                                    <td id="td_surname">...</td>
+                                    <td id="td_age">...</td>
+                                    <td id="td_email">...</td>
+                                    <td id="td_roles">...</td>
                                 </tr>
                             </table>
                         </div>
@@ -73,5 +80,26 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function () {
+        $.get('api/user', function (user) {
+            $('#navbar-username').text(user.email);
+            $('#td_id').text(user.id);
+            $('#td_username').text(user.username);
+            $('#td_name').text(user.name);
+            $('#td_surname').text(user.surname);
+            $('#td_age').text(user.age);
+            $('#td_email').text(user.email);
+        })
+        $.get('api/user/rolesString', function (rolesString) {
+            $('#navbar-roles').text(rolesString)
+            $('#td_roles').text(rolesString);
+            if (rolesString.indexOf("ADMIN") === -1) {
+                $('#v-pills-tab-admin').hide()
+            }
+        })
+    });
+</script>
 </body>
 </html>

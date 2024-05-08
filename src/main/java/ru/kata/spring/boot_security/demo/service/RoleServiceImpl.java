@@ -36,7 +36,6 @@ public class RoleServiceImpl implements RoleService {
         Set<Role> roles = new HashSet<>();
         for (Long roleId : rolesId) {
             roles.add(getRoleById(roleId));
-//            roles.add(roleService.getRoleById(roleId));
         }
         return roles;
     }
