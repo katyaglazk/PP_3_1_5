@@ -57,6 +57,7 @@ $(document).ready(function () {
     }
 
     updateUsersTable();
+    getAllRoles();
     console.log(my_users);
     let deleteUser;
     $(document).on('click', '.btn.btn-danger', function () {
@@ -87,6 +88,42 @@ $(document).ready(function () {
 
     let editUser
     let editId
+
+    // при открытии
+    async function getAllRoles() {
+        let rolles = await fetch("http://localhost:8080/api/admin/roles").then(r => r.json());         //настройки для fetch можно указать после url
+        let rol = "";
+        rolles.forEach((r) => rol += `<option value="${r.id}">${r.name}</option>`);
+        let sel = `<select name="sele" onchange="console.log($('#select').val())" id="select"
+                            multiple class="form-select" size="2" aria-label="Default select">
+                            ${rol}
+                            </select>`;
+        document.getElementById('create_role').innerHTML = sel;
+    }
+
+    // при изменении
+    async function getRoles(idUser) {
+
+        let rolles = await fetch("http://localhost:8080/api/admin/roles").then(r => r.json());
+
+        let user = await fetch("http://localhost:8080/api/admin/user/" + idUser).then(r => r.json());
+        let userRoles = user.roles;
+        let rol = "";
+        for (let n = 0; n < rolles.length; n++) {
+            let isSelected = userRoles.some(role => role.name === rolles[n].name);
+            console.log(isSelected);
+            let selectedAttr = isSelected ? 'selected' : '';
+            rol += `<option value="${rolles[n].id}" ${selectedAttr}> 
+                ${rolles[n].name}</option>`;
+        }
+        let sel = `<select name="sele" onchange="console.log($('#selectEdit').val())" id="selectEdit"  
+                multiple class="form-control sel" size="2">
+                ${rol}
+                </select>`;
+        document.getElementById('selectorEdit').innerHTML = sel;
+    }
+
+    // открываем редактирование юзера
     $(document).on('click', '.btn.btn-info', function () {
         let $tr = $(this).closest('tr');
         let id = $tr.find("#td_id").text();
@@ -98,7 +135,7 @@ $(document).ready(function () {
         let role = $tr.find("#td_role").text().split(', ');
         editId = id;
 
-        let roles = role.roles;
+        getRoles(id);
 
         $('#modalEdit input[name="id_edit"]').val(id);
         $('#modalEdit input[name="username_edit"]').val(username);
@@ -106,7 +143,7 @@ $(document).ready(function () {
         $('#modalEdit input[name="surname_edit"]').val(surname);
         $('#modalEdit input[name="age_edit"]').val(age);
         $('#modalEdit input[name="email_edit"]').val(email);
-        $('#modalEdit select[name="role_edit"] option').each(function() {
+        $('#modalEdit select[name="role_edit"] option').each(function () {
             if (role.includes($(this).text())) {
                 $(this).attr('selected', 'selected');
             }
@@ -118,6 +155,7 @@ $(document).ready(function () {
             }
         )
     })
+
     $("#button_edit").on('click', function () {
         editUser = {
             'id': $('#modalEdit input[name="id_edit"]').val(),
@@ -184,13 +222,9 @@ $(document).ready(function () {
         const age = $('#create_age').val();
         const surname = $('#create_surname').val();
         const username = $('#create_username').val();
-        // const role = $('#create_role').val();
         const roles = $('#create_role option:selected').map(function () {
             return {id: $(this).val(), role: $(this).text()};
         }).get();
-
-        console.log(roles);
-
 
         let user = {
             'name': firstname,
